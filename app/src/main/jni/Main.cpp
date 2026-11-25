@@ -9,9 +9,6 @@
 #include "Hacks.h"
 #include "And64InlineHook/And64InlineHook.hpp"
 
-int glWidth = 0;
-int glHeight = 0;
-
 void (*original_Update)(void* instance) = nullptr;
 void hooked_Update(void* instance) {
     if (original_Update != nullptr) original_Update(instance);
@@ -19,14 +16,12 @@ void hooked_Update(void* instance) {
 
 EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surface);
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
-    eglQuerySurface(dpy, surface, EGL_WIDTH, &glWidth);
-    eglQuerySurface(dpy, surface, EGL_HEIGHT, &glHeight);
-
     if (!Menu::init) { 
         Menu::Setup(); 
         Menu::init = true; 
     }
     
+    // Берем ширину и высоту из ImGui
     ImGui_ImplAndroid_NewFrame(glWidth, glHeight);
     Menu::Draw();
     
