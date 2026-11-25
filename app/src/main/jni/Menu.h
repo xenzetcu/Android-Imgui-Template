@@ -18,9 +18,6 @@ namespace Menu {
     }
 
     void Draw() {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplAndroid_NewFrame();
-        ImGui::NewFrame();
         ImGui::Begin("XENZETCU");
         if (ImGui::BeginTabBar("Tabs")) {
             if (ImGui::BeginTabItem("Visual")) {
