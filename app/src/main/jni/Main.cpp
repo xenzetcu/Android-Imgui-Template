@@ -4,9 +4,13 @@
 #include <pthread.h>
 #include <android/log.h>
 #include <EGL/egl.h>
+#include <dlfcn.h>
 #include "Menu.h"
 #include "Hacks.h"
 #include "And64InlineHook/And64InlineHook.hpp"
+
+int glWidth = 0;
+int glHeight = 0;
 
 void (*original_Update)(void* instance) = nullptr;
 void hooked_Update(void* instance) {
@@ -15,8 +19,17 @@ void hooked_Update(void* instance) {
 
 EGLBoolean (*old_eglSwapBuffers)(EGLDisplay dpy, EGLSurface surface);
 EGLBoolean hook_eglSwapBuffers(EGLDisplay dpy, EGLSurface surface) {
-    if (!Menu::init) { Menu::Setup(); Menu::init = true; }
+    eglQuerySurface(dpy, surface, EGL_WIDTH, &glWidth);
+    eglQuerySurface(dpy, surface, EGL_HEIGHT, &glHeight);
+
+    if (!Menu::init) { 
+        Menu::Setup(); 
+        Menu::init = true; 
+    }
+    
+    ImGui_ImplAndroid_NewFrame(glWidth, glHeight);
     Menu::Draw();
+    
     return old_eglSwapBuffers(dpy, surface);
 }
 
